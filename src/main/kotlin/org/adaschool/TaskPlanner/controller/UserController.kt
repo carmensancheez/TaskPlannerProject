@@ -26,7 +26,7 @@ class UserController(@Autowired val usersService: UserService) {
     fun findUserById(@PathVariable id: String): User? {
         return usersService.findUserById(id) ?: throw UserNotFoundException()
     }
-    @GetMapping("/{email}")
+    @GetMapping("/email/{email}")
     fun findUserByEmail(@PathVariable email: String): User? {
         return usersService.findByEmail(email) ?: throw UserNotFoundException()
     }
