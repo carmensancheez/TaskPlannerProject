@@ -1,5 +1,4 @@
 package org.adaschool.TaskPlanner.controller.auth
-
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import org.adaschool.TaskPlanner.data.dto.LoginDto
@@ -16,30 +15,20 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.crypto.bcrypt.BCrypt
 import org.springframework.web.bind.annotation.*
 import java.util.*
-
 @RestController
 @RequestMapping("/v1/auth")
 class AuthController(
     @Value("\${SECRET}") val secret: String,
     @Autowired val userService: UserService
 ) {
-
     @PostMapping
     fun authenticate(@RequestBody loginDto: LoginDto) : TokenDto? {
-
-
         val user = userService.findByEmail(loginDto.email) ?: throw UserNotFoundException()
-
         if (BCrypt.checkpw(loginDto.password, user.passwordHash)){
-
             return generateTokenDto(user)
-
         }else
             throw InvalidCredentialsException()
-
-
     }
-
     private fun generateToken(user: User, expirationDate: Date): String {
         return Jwts.builder()
             .setSubject(user.id)
@@ -49,7 +38,6 @@ class AuthController(
             .signWith(SignatureAlgorithm.HS256, secret)
             .compact()
     }
-
     private fun generateAppToken(userId: String, expirationDate: Date): String {
         return Jwts.builder()
             .setSubject(userId)
@@ -59,15 +47,10 @@ class AuthController(
             .signWith(SignatureAlgorithm.HS256, secret)
             .compact()
     }
-
     private fun generateTokenDto(user: User): TokenDto? {
-
         val expirationDate = Calendar.getInstance()
         expirationDate.add(Calendar.MINUTE, TOKEN_DURATION_MINUTES)
         val token = user.id?.let { generateAppToken(it, expirationDate.time) }
         return token?.let { TokenDto(it, expirationDate.time) }
-
     }
-
-
 }
